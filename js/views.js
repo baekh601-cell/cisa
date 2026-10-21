@@ -231,6 +231,8 @@
     const sum14 = days.reduce((s, x) => s + x.n, 0);
     const ks = A.keywordStats();
     const dd = dday();
+    const tr = days.map((x) => (S.trend[x.k] == null ? null : S.trend[x.k]));
+    const trendSvg = sparkTrend(tr);
     return `${topbar('CISA 초단기 합격 마스터', { sub: dd, right: `<button class="icon-btn" data-act="go" data-v="settings" aria-label="설정">${I.gear}</button>` })}
 <main class="view">
   ${r ? `<button class="card resume" data-act="resume">${I.play}<span class="grow"><b>이어서 풀기 · ${esc(r.title)}</b><span>${Math.min(r.i + 1, r.ids.length)} / ${r.ids.length}문항 · ${r.mode === 'exam' ? '모의고사 진행 중' : '맞춤 연습'} · ${A.ago(r.start)} 시작</span></span>${I.chev}</button>` : ''}
@@ -270,9 +272,27 @@
   <div class="sec-head"><h2 class="sec-title">최근 14일 학습량</h2><small>합계 ${A.fmtNum(sum14)}문항</small></div>
   <section class="card"><div class="spark" role="img" aria-label="최근 14일 일별 풀이 수">${days.map((x) => `<i class="${x.n ? '' : 'zero'}" style="height:${x.n ? Math.max(6, (x.n / maxDay) * 100) : 4}%" title="${x.k}: ${x.n}문항"></i>`).join('')}</div>
   <div class="spark-x">${days.map((x) => `<span>${x.lab}</span>`).join('')}</div></section>
+  ${trendSvg ? `<div class="sec-head"><h2 class="sec-title">환산 점수 추이</h2><small>일자별 마지막 추정치 · 점선 = 합격 450</small></div><section class="card">${trendSvg}<div class="spark-x">${days.map((x) => `<span>${x.lab}</span>`).join('')}</div></section>` : ''}
   <div class="sec-head"><h2 class="sec-title">핵심 요점 노트</h2><small>${A.notes.length}권</small></div>
   <section class="card tight notes-list"><div class="list">${notesList()}</div></section>
 </main>`;
+  }
+  function sparkTrend(vals) {
+    const pts = vals.map((v, i) => (v == null ? null : { i, v }));
+    const have = pts.filter(Boolean);
+    if (!have.length) return '';
+    const W = 280;
+    const H = 72;
+    const x = (i) => 10 + (i / 13) * (W - 20);
+    const y = (v) => H - 8 - ((v - 200) / 600) * (H - 16);
+    const line = have.map((p, j) => `${j ? 'L' : 'M'}${x(p.i).toFixed(1)} ${y(p.v).toFixed(1)}`).join(' ');
+    const last = have[have.length - 1];
+    return `<svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" role="img" aria-label="최근 14일 CISA 환산 점수 추이, 최근 ${last.v}점" style="display:block">
+      <line x1="10" x2="${W - 10}" y1="${y(450).toFixed(1)}" y2="${y(450).toFixed(1)}" stroke="var(--fg-2)" stroke-dasharray="4 4" stroke-width="1" opacity=".6"/>
+      <path d="${line}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+      ${have.map((p) => `<circle cx="${x(p.i).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="${p === last ? 4.5 : 2.5}" fill="${p === last ? 'var(--accent)' : 'var(--surface)'}" stroke="var(--accent)" stroke-width="2"/>`).join('')}
+      <text x="${Math.min(W - 12, x(last.i) + 2).toFixed(1)}" y="${Math.max(12, y(last.v) - 9).toFixed(1)}" text-anchor="end" font-size="11" font-family="var(--font-mono)" fill="var(--fg)">${last.v}</text>
+    </svg>`;
   }
   function notesList() {
     if (!A.notes.length) return '<div class="empty">요점 노트 데이터가 없습니다.</div>';
@@ -405,7 +425,7 @@
     const exam = s.mode === 'exam';
     const review = s.mode === 'review';
     const a = s.ans[q.id];
-    const graded = !exam && a && a.ok != null;
+    const graded = !exam && !review && a && a.ok != null;
     const perm = s.perm[q.id] || q.o.map((_, j) => j);
     const sel = exam ? (a ? a.s : null) : graded ? a.s : V.pending;
     const answeredN = Object.keys(s.ans).length;
@@ -543,9 +563,10 @@
       const q = A.QM[id];
       if (a && a.s != null) {
         a.ok = a.s === q.a;
-        A.record(q, a.s, a.ok);
+        A.record(q, a.s, a.ok, true);
       }
     }
+    A.flushRecords();
     finishSession();
   }
   function finishSession() {
@@ -647,6 +668,12 @@
     return `<section class="card stack"><div class="kpis"><div class="kpi"><b>${A.fmtNum(est.att)}</b><span>총 풀이 횟수</span></div><div class="kpi"><b>${A.pct(est.att ? est.corr / est.att : null)}</b><span>누적 정답률</span></div><div class="kpi"><b>${A.dayStreak()}일</b><span>연속 학습</span></div></div></section>
     <div class="sec-head"><h2 class="sec-title">세션 기록</h2><small>최근 ${Math.min(S.hist.length, 30)}회</small></div>
     <section class="card tight">${S.hist.length ? `<div class="list">${S.hist.slice(0, 30).map(histRow).join('')}</div>` : '<div class="empty">아직 끝낸 세션이 없습니다.</div>'}</section>
+    <div class="sec-head"><h2 class="sec-title">최근 풀이 50건</h2><small>전체 로그 ${A.fmtNum(S.log.length)}건 보관</small></div>
+    <section class="card tight">${S.log.length ? `<div class="list">${S.log.slice(-50).reverse().map(([t, id, sel, ok]) => {
+      const q = A.QM[id];
+      if (!q) return '';
+      return `<div class="hrow"><span style="min-width:0"><b style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(q.q)}</b><span class="s">${esc(id)} · ${esc(q.t || '')} · ${A.ago(t)}</span></span><span class="sc" style="color:${ok ? 'var(--ok)' : 'var(--bad)'}">${ok ? '✓' : '✗'}</span></div>`;
+    }).join('')}</div>` : '<div class="empty">아직 푼 문제가 없습니다.</div>'}</section>
     <div class="sec-head"><h2 class="sec-title">일별 기록</h2><small>최근 30일</small></div>
     <section class="card tight">${days.length ? `<div class="tbl"><table><thead><tr><th>날짜</th><th>풀이</th><th>정답</th><th>정답률</th></tr></thead><tbody>${days.map((d) => `<tr><td class="mono">${d}</td><td class="mono">${S.daily[d][0]}</td><td class="mono">${S.daily[d][1]}</td><td class="mono">${A.pct(S.daily[d][1] / Math.max(1, S.daily[d][0]))}</td></tr>`).join('')}</tbody></table></div>` : '<div class="empty">기록이 없습니다.</div>'}</section>`;
   }

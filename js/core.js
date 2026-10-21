@@ -88,7 +88,7 @@
       delete mem[k];
       try { localStorage.removeItem(NS + k); } catch (e) { /* 무시 */ }
     },
-    keys: ['prog', 'bm', 'wrong', 'daily', 'hist', 'cards', 'set', 'resume']
+    keys: ['prog', 'bm', 'wrong', 'daily', 'hist', 'log', 'trend', 'cards', 'set', 'resume']
   };
 
   const DEFAULT_SET = { theme: 'dark', fs: 'md', shuffle: true, oneTap: false, vibrate: true, grad: 2, examDate: '', wake: false, hint: false };
@@ -98,6 +98,8 @@
     wrong: A.store.get('wrong', {}),  // {id: {n 오답횟수, t 시각, ok 졸업 진행}}
     daily: A.store.get('daily', {}),  // {YYYY-MM-DD: [풀이, 정답]}
     hist: A.store.get('hist', []),    // 세션 기록 [{t, mode, title, n, c, sc, by}]
+    log: A.store.get('log', []),      // 풀이 로그 [[시각, id, 선택, 정답여부]] 최근 3000건
+    trend: A.store.get('trend', {}),  // 일자별 CISA 환산 예상 점수 {YYYY-MM-DD: 점수}
     cards: A.store.get('cards', {}),  // {deckId: {cardIdx: 1|0}}
     set: Object.assign({}, DEFAULT_SET, A.store.get('set', {})),
     resume: A.store.get('resume', null)
@@ -231,7 +233,7 @@
   };
 
   // ---------- 채점 기록 ----------
-  A.record = (q, sel, ok) => {
+  A.record = (q, sel, ok, defer) => {
     const now = Date.now();
     let p = S.prog[q.id];
     if (!p) p = S.prog[q.id] = { n: 0, c: 0, f: ok ? 1 : 0, l: 0, s: -1, t: 0, st: 0 };
@@ -258,10 +260,16 @@
     const day = S.daily[d] || (S.daily[d] = [0, 0]);
     day[0]++;
     if (ok) day[1]++;
-    A.save('prog');
-    A.save('wrong');
-    A.save('daily');
+    S.log.push([now, q.id, sel, ok ? 1 : 0]);
+    if (S.log.length > 3000) S.log.splice(0, S.log.length - 3000);
+    if (!defer) A.flushRecords();
     return graduated;
+  };
+  // 기록 저장 + 오늘의 환산 점수 스냅샷 (모의고사 제출처럼 여러 건이면 마지막에 한 번만 호출)
+  A.flushRecords = () => {
+    const est = A.estimate();
+    if (est.solved >= 5) S.trend[A.today()] = est.score;
+    for (const k of ['prog', 'wrong', 'daily', 'log', 'trend']) A.save(k);
   };
   A.removeWrong = (id) => {
     delete S.wrong[id];
@@ -476,6 +484,8 @@
     S.wrong = {};
     S.daily = {};
     S.hist = [];
+    S.log = [];
+    S.trend = {};
     S.cards = {};
     S.resume = null;
     S.set = Object.assign({}, DEFAULT_SET, { theme: S.set.theme, fs: S.set.fs });
