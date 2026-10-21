@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ko" data-skin="dark">
+<head>
+<meta charset="utf-8">
+<title>CISA 초단기 합격 마스터</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="CISA 시험 대비 모바일 학습 앱 — 4,000문항 문제은행, 보기별 해설, ISACA 10계명, 암기카드, 환산 점수">
+<meta name="theme-color" content="#0c1220">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CISA 마스터">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div id="app">
+  <div class="boot" role="status" aria-live="polite">
+    <div class="logo">CISA<span>·</span>MASTER</div>
+    <div class="bar"><i id="boot-bar" style="width:4%"></i></div>
+    <p id="boot-msg">학습 데이터를 불러오는 중…</p>
+  </div>
+</div>
+<noscript><p style="padding:24px">이 앱은 JavaScript가 필요합니다. 브라우저 설정에서 JavaScript를 켜 주세요.</p></noscript>
+<script>
+/* 데이터 레지스트리 — 모든 데이터 파일(data/*.js)은 이 API로 등록된다 */
+window.CISA = {
+  questions: [], notes: [], decks: [], isaca: null, loaded: [], failed: [],
+  addQuestions: function (a) { if (Array.isArray(a)) for (var i = 0; i < a.length; i++) this.questions.push(a[i]); },
+  addNote: function (n) { if (n && n.id) this.notes.push(n); },
+  addNotes: function (a) { (a || []).forEach(this.addNote, this); },
+  addDecks: function (a) { if (Array.isArray(a)) for (var i = 0; i < a.length; i++) this.decks.push(a[i]); },
+  setIsaca: function (o) { this.isaca = o; }
+};
+</script>
+<script src="data/manifest.js"></script>
+<script src="js/core.js"></script>
+<script src="js/views.js"></script>
+<script>
+(function () {
+  var files = window.CISA_FILES || [];
+  var done = 0;
+  var bar = document.getElementById('boot-bar');
+  var msg = document.getElementById('boot-msg');
+  function step() {
+    done++;
+    if (bar) bar.style.width = Math.max(4, (done / files.length) * 100) + '%';
+    if (msg) msg.textContent = '학습 데이터를 불러오는 중… ' + done + '/' + files.length;
+  }
+  function load(src) {
+    return new Promise(function (res) {
+      var s = document.createElement('script');
+      s.src = src;
+      s.async = false;
+      s.onload = function () { CISA.loaded.push(src); step(); res(); };
+      s.onerror = function () { CISA.failed.push(src); step(); res(); };
+      document.body.appendChild(s);
+    });
+  }
+  Promise.all(files.map(load)).then(function () {
+    App.startApp();
+    if (CISA.failed.length) App.toast('일부 데이터 파일을 불러오지 못했습니다: ' + CISA.failed.join(', '));
+  });
+  if ('serviceWorker' in navigator && !window.CISA_NO_SW && (location.protocol === 'https:' || /^(localhost|127\.0\.0\.1)$/.test(location.hostname))) {
+    window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+  }
+})();
+</script>
+</body>
+</html>

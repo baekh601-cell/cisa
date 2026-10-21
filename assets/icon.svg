@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#0c1220"/>
+  <rect x="64" y="64" width="384" height="384" rx="88" fill="#141e31" stroke="#33466a" stroke-width="8"/>
+  <path d="M158 250l66 66 132-140" fill="none" stroke="#7ea6ff" stroke-width="42" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="256" y="404" text-anchor="middle" font-family="IBM Plex Mono, DejaVu Sans Mono, Menlo, monospace" font-size="58" font-weight="700" fill="#e9eef7" letter-spacing="8">CISA</text>
+</svg>
