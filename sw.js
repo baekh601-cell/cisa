@@ -1,5 +1,5 @@
 /* 오프라인 캐시 (HTTPS 또는 localhost에서만 동작) — 데이터·코드 변경 시 VERSION을 올린다 */
-const VERSION = 'cisa-master-2026-10-21-1';
+const VERSION = 'cisa-master-2026-10-21-2';
 importScripts('data/manifest.js');
 const CORE = ['./', 'index.html', 'css/app.css', 'js/core.js', 'js/views.js', 'data/manifest.js', 'manifest.webmanifest',
   'assets/icon.svg', 'assets/icon-192.png', 'assets/icon-512.png'].concat(self.CISA_FILES || []);
