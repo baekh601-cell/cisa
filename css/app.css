@@ -10,7 +10,7 @@
   --line-2: #33466a;
   --fg: #e9eef7;
   --fg-2: #bcc7da;
-  --muted: #8593ab;
+  --muted: #95a3bb;
   --accent: #7ea6ff;
   --accent-ink: #0a1430;
   --accent-soft: rgba(126, 166, 255, 0.14);
@@ -58,25 +58,25 @@
   --line-2: #c7d0e0;
   --fg: #172033;
   --fg-2: #39445a;
-  --muted: #637089;
+  --muted: #566278;
   --accent: #3a63e0;
   --accent-ink: #ffffff;
   --accent-soft: rgba(58, 99, 224, 0.1);
-  --ok: #138a4a;
+  --ok: #0e7740;
   --ok-soft: rgba(19, 138, 74, 0.1);
-  --bad: #d13b3b;
+  --bad: #b92e2e;
   --bad-soft: rgba(209, 59, 59, 0.09);
   --warn: #a8680a;
   --warn-soft: rgba(168, 104, 10, 0.1);
-  --k-first: #d2481f;
+  --k-first: #b13a16;
   --k-first-soft: rgba(210, 72, 31, 0.11);
-  --k-best: #12854a;
+  --k-best: #0c6e3b;
   --k-best-soft: rgba(18, 133, 74, 0.11);
-  --k-primary: #0b7f92;
+  --k-primary: #07697a;
   --k-primary-soft: rgba(11, 127, 146, 0.11);
   --k-greatest: #7a3fd0;
   --k-greatest-soft: rgba(122, 63, 208, 0.1);
-  --k-most: #9a6a00;
+  --k-most: #815800;
   --k-most-soft: rgba(154, 106, 0, 0.12);
   --k-least: #c02a78;
   --k-least-soft: rgba(192, 42, 120, 0.1);
@@ -233,7 +233,7 @@ a { color: var(--accent); }
 
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip {
-  min-height: 40px;
+  min-height: 44px;
   padding: 0 14px;
   border-radius: 999px;
   border: 1px solid var(--line-2);
@@ -250,7 +250,7 @@ a { color: var(--accent); }
 .chip[data-k][aria-pressed="true"] { border-color: var(--kc); background: var(--kcs); color: var(--kc); }
 
 .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; padding: 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
-.seg button { min-height: 42px; border-radius: 10px; font-weight: 700; font-size: 0.88rem; color: var(--muted); padding: 0 6px; }
+.seg button { min-height: 44px; border-radius: 10px; font-weight: 700; font-size: 0.88rem; color: var(--muted); padding: 0 6px; }
 .seg button[aria-pressed="true"] { background: var(--surface-3); color: var(--fg); }
 
 .field { display: flex; flex-direction: column; gap: 6px; }
@@ -274,7 +274,7 @@ textarea.input { padding: 12px 14px; min-height: 120px; font-family: var(--font-
 .li .chev { color: var(--muted); flex: none; }
 
 .toggle { position: relative; width: 52px; height: 32px; flex: none; }
-.toggle input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.toggle input { position: absolute; inset: -6px -4px; opacity: 0; margin: 0; cursor: pointer; z-index: 1; }
 .toggle span { position: absolute; inset: 0; border-radius: 999px; background: var(--surface-3); border: 1px solid var(--line-2); transition: background 0.15s ease; pointer-events: none; }
 .toggle span::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: var(--fg-2); transition: transform 0.15s ease; }
 .toggle input:checked + span { background: var(--accent); border-color: transparent; }
@@ -558,3 +558,5 @@ mark.hl { background: var(--k-most-soft); color: var(--fg); border-radius: 3px; 
 }
 
 a.btn { text-decoration: none; }
+button.kbadge { position: relative; min-height: 30px; }
+button.kbadge::after { content: ""; position: absolute; inset: -8px -6px; }

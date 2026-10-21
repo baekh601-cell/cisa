@@ -363,7 +363,7 @@
     <span class="lbl">출제 순서</span>
     ${segHtml('ford', [['rand', '랜덤'], ['seq', '번호 순']], f.order)}
   </section>
-  <p class="note-line">문제를 풀면 즉시 모든 보기의 정답 근거·함정 해설과 ISACA 한 줄 공식이 나옵니다. <button class="btn ghost" style="min-height:32px;padding:0 8px" data-act="freset">필터 초기화</button></p>
+  <p class="note-line">문제를 풀면 즉시 모든 보기의 정답 근거·함정 해설과 ISACA 한 줄 공식이 나옵니다. <button class="btn ghost" style="min-height:44px;padding:0 10px" data-act="freset">필터 초기화</button></p>
   <div class="startbar"><span class="cnt"><b id="fcount">${A.fmtNum(list.length)}</b>조건 일치</span><button class="btn primary lg" data-act="start-practice" id="fstart" ${list.length ? '' : 'disabled'}>${I.play}연습 시작 · ${n}문항</button></div>`;
   }
   function mockSetup() {
@@ -467,7 +467,7 @@
     }).join('');
 
     let verdict = '';
-    if (graded) verdict = a.ok ? `<div class="verdict y" id="verdict">${I.ok}<div>정답입니다<span>${q.k !== 'NONE' ? `${q.k} 문제 — ISACA 관점을 정확히 짚었습니다` : '개념을 정확히 알고 있습니다'}</span></div></div>` : `<div class="verdict n" id="verdict">${I.no}<div>오답 — 정답은 ${LETTERS[perm.indexOf(q.a)]}<span>오답노트에 자동 저장되었습니다 · ${S.set.grad}회 연속 맞히면 졸업</span></div></div>`;
+    if (graded) verdict = a.ok ? `<div class="verdict y" id="verdict">${I.ok}<div>정답입니다<span>${q.k !== 'NONE' ? `${q.k} 문제 — ISACA 관점을 정확히 짚었습니다` : '개념을 정확히 알고 있습니다'}</span></div></div>` : `<div class="verdict n" id="verdict">${I.no}<div>오답 — 정답은 ${LETTERS[perm.indexOf(q.a)]}<span>${esc(q.o[q.a])}</span><span style="font-weight:500;margin-top:4px">오답노트에 저장됨 · ${S.set.grad}회 연속 맞히면 졸업</span></div></div>`;
     else if (review) verdict = a && a.s != null ? (a.ok ? `<div class="verdict y" id="verdict">${I.ok}<div>맞힌 문제</div></div>` : `<div class="verdict n" id="verdict">${I.no}<div>틀린 문제 — 정답은 ${LETTERS[perm.indexOf(q.a)]}</div></div>`) : `<div class="verdict n" id="verdict">${I.no}<div>미응답 — 정답은 ${LETTERS[perm.indexOf(q.a)]}</div></div>`;
 
     return `<header class="qtop"><div class="row">
@@ -895,7 +895,7 @@
       const k = el.dataset.k;
       const ids = pickIds[t](t === 'kw' ? k : d);
       if (!ids.length) return A.toast(t === 'wrong' ? '오답노트가 비어 있습니다' : '문제가 없습니다');
-      const title = t === 'dom' ? `${D[d].code} 연습` : t === 'kw' ? `${k} 집중` : t === 'weak' ? `약점 집중 · ${D[A.QM[ids[0]].d].code}` : QTITLE[t];
+      const title = t === 'dom' ? `${D[d].code} 연습` : t === 'kw' ? `${k} 집중` : t === 'weak' ? `약점 집중 · ${D[A.QM[ids[0]].d].code}` : t === 'daily' ? `오늘의 ${ids.length}문제` : QTITLE[t];
       startSession({ ids, title, src: t });
     },
     resume: () => {
