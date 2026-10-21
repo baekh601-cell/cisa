@@ -67,7 +67,11 @@ for (let d = 1; d <= 5; d++) {
   }
 }
 
-const files = fs.existsSync(SDIR) ? fs.readdirSync(SDIR).filter((f) => f.endsWith('.json')).sort() : [];
+// staging/DONE 파일이 있으면 거기 적힌 배치(파일명 접두어)만 빌드 — 작성 중인 파일 혼입 방지
+const donePath = path.join(SDIR, 'DONE');
+const done = fs.existsSync(donePath) ? fs.readFileSync(donePath, 'utf8').split(/\s+/).filter(Boolean) : null;
+const files = (fs.existsSync(SDIR) ? fs.readdirSync(SDIR).filter((f) => f.endsWith('.json')).sort() : [])
+  .filter((f) => !done || done.some((id) => f.startsWith(id + '_')));
 const fresh = { 1: [], 2: [], 3: [], 4: [], 5: [] };
 for (const f of files) {
   const m = /D([1-5])/.exec(f);
