@@ -35,7 +35,7 @@ cp "$OUT/base.apk" "$OUT/unsigned.apk"
 (cd "$OUT/dex" && zip -q "$OUT/unsigned.apk" classes.dex)
 "$BT/zipalign" -f -p 4 "$OUT/unsigned.apk" "$OUT/aligned.apk"
 mkdir -p "$ROOT/releases"
-"$BT/apksigner" sign --ks "$KS" --ks-key-alias cisa --ks-pass pass:cisa-master --key-pass pass:cisa-master \
+"$BT/apksigner" sign --ks "$KS" --ks-key-alias cisa --ks-pass pass:cisa-master --key-pass pass:cisa-master --v4-signing-enabled false \
   --out "$ROOT/releases/cisa-master.apk" "$OUT/aligned.apk"
 "$BT/apksigner" verify "$ROOT/releases/cisa-master.apk"
 echo "완료: releases/cisa-master.apk ($(du -h "$ROOT/releases/cisa-master.apk" | cut -f1)) · v$VN ($VC)"
