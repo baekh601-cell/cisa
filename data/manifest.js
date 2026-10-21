@@ -2,7 +2,9 @@
    (service worker도 이 목록을 읽어 오프라인 캐시를 만든다) */
 self.CISA_FILES = [
   'data/isaca.js',
-  'data/flashcards.js',
+  'data/cards/cards1.js',
+  'data/cards/cards2.js',
+  'data/cards/cards3.js',
   'data/notes/d1.js',
   'data/notes/d2.js',
   'data/notes/d3.js',
