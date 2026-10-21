@@ -28,6 +28,16 @@ PC의 IP(예: `192.168.0.10`)를 확인한 뒤 폰 브라우저에서 `http://19
 저장소 **Settings → Pages → Build and deployment → Deploy from a branch**에서 이 앱이 있는 브랜치와 `/ (root)`를 선택 → 잠시 후 `https://<계정>.github.io/<저장소>/` 주소가 생긴다.
 폰에서 열고 **홈 화면에 추가**하면 앱처럼 실행되고, 한 번 열어 둔 뒤에는 **지하철 등 오프라인에서도** 서비스 워커 캐시로 동작한다(HTTPS 필요).
 
+### 4) 안드로이드 앱(APK)
+**다운로드: https://github.com/baekh601-cell/cisa/raw/HEAD/releases/cisa-master.apk**
+
+폰에서 링크를 열어 내려받고 설치한다(처음 한 번 ‘출처를 알 수 없는 앱 설치’ 허용). 웹앱 전체가 앱 안에 들어 있어 **인터넷 없이 동작**한다.
+- **업데이트 확인**: 앱을 열 때마다 `android/version.json`을 확인해 새 버전이 있으면 다운로드 안내를 띄운다(설정 → 앱 정보·업데이트에서 수동 확인 가능). 같은 서명 키로 빌드하므로 새 APK를 기존 앱 위에 설치해도 학습 기록이 유지된다.
+- 앱 전용: 하드웨어 뒤로 가기(시트 닫기 → 이전 화면 → 홈 → 두 번 눌러 종료), 백업 파일을 다운로드 폴더에 저장, 화면 꺼짐 방지, 진동.
+- 빌드: `ANDROID_HOME=<SDK 경로> tools/build-android.sh` → `releases/cisa-master.apk` (Gradle 불필요, JDK 17+·Android SDK 34 필요).
+  새 버전 배포는 `android/version.json`의 `versionCode`를 1 올리고 `versionName`·`notes`를 고친 뒤 빌드해 APK와 함께 커밋하면, 설치된 앱이 다음 실행 때 알려 준다.
+- 서명 키(`android/keystore/cisa-master.jks`)는 개인 학습용 앱의 업데이트 연속성을 위해 저장소에 포함했다. 앱이 요구하는 권한은 인터넷·진동뿐이다.
+
 > 학습 기록은 **브라우저별로** 저장된다. 기기를 바꾸거나 브라우저 데이터를 지우기 전에 `설정 → 학습 기록 백업`으로 백업 코드를 복사(또는 파일 저장)해 두고, 새 기기에서 붙여넣어 복원한다.
 
 ## 사용 팁 (한 손 모드)
@@ -54,7 +64,9 @@ data/notes/d1~d5.js     도메인별 요점 노트
 data/cards/cards1~3.js  암기카드 덱
 data/questions/d1~d5.js 문제은행 (ID = D1-0001 …, 학습 기록과 연결)
 sw.js, manifest.webmanifest, assets/  PWA(오프라인·홈 화면 아이콘)
-tools/                  문제 작성 가이드 · 검사기 · 빌드 스크립트
+android/                안드로이드 앱(WebView 래퍼) 소스 · 아이콘 · 서명 키 · version.json(업데이트 확인용)
+releases/cisa-master.apk  최신 안드로이드 APK
+tools/                  문제 작성 가이드 · 검사기 · 문제/게시용/APK 빌드 스크립트
 ```
 
 ## 데이터 보강·확장
