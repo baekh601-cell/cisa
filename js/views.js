@@ -74,7 +74,13 @@
       A.sheet(`<h3>${esc(o.title)}</h3>${o.body ? `<p>${o.body}</p>` : ''}<div class="acts"><button class="btn" data-act="sheet-no">${esc(o.no || '취소')}</button><button class="btn ${o.danger ? 'danger' : 'primary'}" data-act="sheet-yes">${esc(o.yes || '확인')}</button></div>`);
       sheetResolve = res;
     });
-  const vibrate = (p) => { try { if (S.set.vibrate && navigator.vibrate) navigator.vibrate(p); } catch (e) { /* 미지원 */ } };
+  const vibrate = (p) => {
+    if (!S.set.vibrate) return;
+    try {
+      if (A.native) A.native.vibrate(String(p));
+      else if (navigator.vibrate) navigator.vibrate(p);
+    } catch (e) { /* 미지원 */ }
+  };
   const kb = (k) => `<span class="kbadge k-${k}">${k === 'NONE' ? '일반' : k}</span>`;
   const dtag = (d) => `<span class="dtag">${D[d].code} · ${esc(D[d].short)}</span>`;
   const lvDots = (lv) => `<span class="lv" title="난이도 ${lv}">${[1, 2, 3].map((i) => `<i class="${i <= lv ? 'on' : ''}"></i>`).join('')}</span>`;
@@ -163,6 +169,10 @@
   // 화면 꺼짐 방지(선택)
   let lock = null;
   async function wake(on) {
+    if (A.native) {
+      try { A.native.keepScreenOn(!!(on && S.set.wake)); } catch (e) { /* 무시 */ }
+      return;
+    }
     try {
       if (on && S.set.wake && 'wakeLock' in navigator && !lock) {
         lock = await navigator.wakeLock.request('screen');
@@ -191,6 +201,9 @@
     root.setAttribute('data-fs', S.set.fs || 'md');
     const m = document.querySelector('meta[name="theme-color"]');
     if (m) m.setAttribute('content', skin === 'light' ? '#f3f5fa' : '#0c1220');
+    if (A.native) {
+      try { A.native.setTheme(skin === 'light'); } catch (e) { /* 무시 */ }
+    }
   };
   try {
     window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => S.set.theme === 'auto' && A.applyTheme());
@@ -827,6 +840,9 @@
     <input type="file" id="s-file" accept="application/json,.json,.txt" data-on="restore-file" hidden>
     <button class="btn danger block" data-act="reset">모든 학습 기록 초기화</button>
   </section>
+  <div class="sec-head"><h2 class="sec-title">${A.native ? '앱 정보·업데이트' : '안드로이드 앱'}</h2></div>
+  <section class="card stack">${A.native ? `<div class="row"><span class="grow"><b>CISA 마스터 v${esc(A.appVersion ? A.appVersion.name : '?')}</b><br><span class="muted" style="font-size:.8rem">앱을 열 때마다 새 버전을 자동으로 확인합니다</span></span><button class="btn" data-act="upd-check">업데이트 확인</button></div>` :
+    `<p class="note-line" style="margin:0">안드로이드 폰에 앱으로 설치하면 인터넷 없이도 동작하고, 새 버전이 나오면 앱이 알려 줍니다.</p><a class="btn primary block" href="${A.APK_URL}" target="_blank" rel="noopener">안드로이드 앱(APK) 내려받기</a><p class="note-line" style="margin:0">내려받은 파일을 열고 ‘출처를 알 수 없는 앱 설치’를 허용하면 설치됩니다. 학습 기록은 브라우저와 앱이 따로 저장되므로 백업 코드로 옮기세요.</p>`}</section>
   <div class="sec-head"><h2 class="sec-title">정보</h2></div>
   <section class="card tight"><div class="list">
     <div class="frow"><b>문제은행 ${A.fmtNum(qn)}문항</b><span>${A.DIDS.map((d) => `${D[d].code} ${A.byD[d].length}`).join(' · ')}</span></div>
@@ -1035,6 +1051,10 @@
     'set-grad': (el) => { S.set.grad = Number(el.dataset.v); A.save('set'); rerender(); },
     'backup-copy': () => {
       const text = A.exportData();
+      if (A.native) {
+        A.native.copy(text);
+        return A.toast(`백업 코드를 복사했습니다 (${Math.round(text.length / 1024)}KB)`);
+      }
       const ta = document.getElementById('s-backup');
       const fallback = () => {
         if (ta) {
@@ -1051,6 +1071,10 @@
       }
     },
     'backup-file': () => {
+      if (A.native) {
+        const r = A.native.saveFile(`cisa-backup-${A.today()}.json`, A.exportData());
+        return A.toast(r === 'downloads' ? '다운로드 폴더에 백업 파일을 저장했습니다' : r === 'share' ? '공유 메뉴에서 저장할 곳을 고르세요' : '저장에 실패했습니다. 백업 코드 복사를 사용하세요');
+      }
       try {
         const blob = new Blob([A.exportData()], { type: 'application/json' });
         const a = document.createElement('a');
@@ -1069,6 +1093,16 @@
       const text = ta && ta.value.trim();
       if (!text) return A.toast('백업 코드를 먼저 붙여넣으세요');
       await restore(text);
+    },
+    'upd-check': () => A.checkUpdate(true),
+    'upd-get': (el) => {
+      A.closeSheet(false);
+      if (A.native) A.native.openUrl(el.dataset.url);
+    },
+    'upd-later': (el) => {
+      S.set.updSkip = { code: Number(el.dataset.code), t: Date.now() };
+      A.save('set');
+      A.closeSheet(false);
     },
     reset: async () => {
       const ok = await A.confirm({ title: '모든 학습 기록을 지울까요?', body: '풀이 기록, 오답노트, 북마크, 카드 진도, 모의고사 기록이 삭제됩니다. 되돌릴 수 없으니 먼저 백업하세요.', yes: '전부 초기화', danger: true });
@@ -1198,10 +1232,53 @@
     }
   }, { passive: true });
 
+  // ---------- 안드로이드 앱 연동 (뒤로 가기 · 일시정지 · 업데이트 확인) ----------
+  A.handleBack = () => {
+    if (document.querySelector('.scrim')) {
+      A.closeSheet(false);
+      return true;
+    }
+    if (V.cur.name === 'quiz') {
+      ACT['quiz-exit']();
+      return true;
+    }
+    if (V.stack.length || V.cur.name !== 'home') {
+      A.back();
+      return true;
+    }
+    return false;
+  };
+  A.onAppPause = () => saveElapsed();
+  A.checkUpdate = (manual) => {
+    if (!A.native) return;
+    if (manual) A.toast('업데이트를 확인하는 중…');
+    try { A.native.checkUpdate(!!manual); } catch (e) { if (manual) A.toast('업데이트를 확인할 수 없습니다'); }
+  };
+  A.onUpdateInfo = (text, manual) => {
+    let info = null;
+    try { info = text ? JSON.parse(text) : null; } catch (e) { info = null; }
+    if (!info || !info.versionCode) {
+      if (manual) A.toast('업데이트 정보를 가져오지 못했습니다. 인터넷 연결을 확인하세요');
+      return;
+    }
+    const cur = A.appVersion || { name: '?', code: 0 };
+    if (info.versionCode <= cur.code) {
+      if (manual) A.toast(`최신 버전입니다 (v${cur.name})`);
+      return;
+    }
+    const skip = S.set.updSkip;
+    if (!manual && skip && skip.code === info.versionCode && Date.now() - skip.t < 86400000) return;
+    A.sheet(`<h3>새 버전 v${esc(info.versionName)}이 나왔습니다</h3>
+      <p>${esc(info.notes || '')}</p>
+      <p class="note-line">현재 v${esc(cur.name)} → v${esc(info.versionName)}${info.date ? ` · ${esc(info.date)}` : ''}. 내려받은 APK를 열어 설치하면 학습 기록은 그대로 유지됩니다.</p>
+      <div class="acts"><button class="btn" data-act="upd-later" data-code="${info.versionCode}">나중에</button><button class="btn primary" data-act="upd-get" data-url="${esc(info.apk || A.APK_URL)}">다운로드</button></div>`);
+  };
+
   A.startApp = () => {
     A.buildIndex();
     A.applyTheme();
     if (S.resume && !(S.resume.ids || []).every((id) => A.QM[id])) A.persistSession(null);
     render({ top: true });
+    if (A.native) setTimeout(() => A.checkUpdate(false), 1500);
   };
 })();

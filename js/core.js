@@ -17,6 +17,18 @@
   A.KCHIPS = A.KTYPES.concat('NONE');
   A.KLABEL = { FIRST: '가장 먼저', BEST: '최선·가장 효과적', PRIMARY: '주된 목적', GREATEST: '가장 큰 우려', MOST: '가장 중요·가능성', LEAST: '가장 적은·부정형', NONE: '일반' };
   A.PASS_P = 0.65; // 합격선 450점 ≈ 정답률 65% (ISACA 비공개 환산식의 근사)
+  // 안드로이드 앱(WebView)에서만 존재하는 네이티브 브리지 — 웹에서는 null
+  A.native = window.AndroidApp || null;
+  A.APK_URL = 'https://github.com/baekh601-cell/cisa/raw/HEAD/releases/cisa-master.apk';
+  A.appVersion = (() => {
+    if (!A.native) return null;
+    try {
+      const [name, code] = String(A.native.appVersion()).split('|');
+      return { name, code: Number(code) || 0 };
+    } catch (e) {
+      return null;
+    }
+  })();
   A.EXAMS = [
     { id: 'full', n: 150, min: 240, name: '실전 모의고사', desc: '실제 시험과 같은 150문항 · 4시간' },
     { id: 'half', n: 75, min: 120, name: '하프 모의고사', desc: '75문항 · 2시간' },

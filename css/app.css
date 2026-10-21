@@ -556,3 +556,5 @@ mark.hl { background: var(--k-most-soft); color: var(--fg); border-radius: 3px; 
 @media (min-width: 720px) {
   .decks { grid-template-columns: 1fr 1fr; }
 }
+
+a.btn { text-decoration: none; }
