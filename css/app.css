@@ -484,7 +484,7 @@ mark.kw .en { font-family: var(--font-mono); font-size: 0.78em; font-weight: 600
 .cmd .body { padding: 0 16px 16px; display: flex; flex-direction: column; gap: 10px; }
 .cmd .rule { font-weight: 700; padding: 10px 12px; border-radius: 10px; background: var(--surface-3); }
 .chev { transition: transform 0.15s ease; width: 20px; height: 20px; }
-.open > button .chev, .open > summary .chev { transform: rotate(90deg); }
+.open > button .chev, details[open] > summary .chev { transform: rotate(90deg); }
 .fgroup h3 { margin: 4px 2px 8px; font-size: 0.86rem; color: var(--fg-2); }
 .frow { display: flex; flex-direction: column; gap: 2px; padding: 11px 2px; }
 .frow b { font-size: 0.95rem; }
@@ -511,6 +511,8 @@ mark.kw .en { font-family: var(--font-mono); font-size: 0.78em; font-weight: 600
 .tbl { overflow-x: auto; margin: 8px 0; border-radius: 10px; border: 1px solid var(--line); }
 .tbl table { border-collapse: collapse; width: 100%; font-size: 0.84rem; line-height: 1.5; min-width: 100%; }
 .tbl th, .tbl td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+.tbl th, .tbl td { min-width: 5.5em; }
+.tbl td:first-child { font-weight: 600; color: var(--fg); }
 .tbl th { background: var(--surface-3); color: var(--fg); font-weight: 700; white-space: nowrap; }
 .tbl tr:last-child td { border-bottom: 0; }
 .search { position: relative; }
