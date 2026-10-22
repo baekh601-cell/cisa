@@ -1,7 +1,7 @@
 {
-  "versionCode": 2,
-  "versionName": "1.1.0",
+  "versionCode": 3,
+  "versionName": "1.2.0",
   "date": "2026-10-22",
   "apk": "https://github.com/baekh601-cell/cisa/raw/HEAD/releases/cisa-master.apk",
-  "notes": "실전 수준 개정: 기존 4,000문항 전면 재작성(모든 보기가 그럴듯한 실전형, 말장난·부정형 제거) + 신규 1,000문항 추가 → 총 5,000문항. 학습 기록은 그대로 유지됩니다."
+  "notes": "공식 QAE 형식 정렬: 감사인 관점 문항 43%·짧은 지식형 36%로 개정(1,725문항), ISACA 고유 관점·약한 개념 신규 300문항 추가 → 총 5,300문항. 문항 유형 필터와 ISACA 고유 관점 배지 추가. 학습 기록은 그대로 유지됩니다."
 }
