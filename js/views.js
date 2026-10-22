@@ -277,7 +277,7 @@
   </div></section>
   <div class="sec-head"><h2 class="sec-title">ISACA 키워드별 정답률</h2><small>탭하면 그 유형만</small></div>
   <div class="kstats">
-    ${A.KTYPES.map((k) => {
+    ${A.KACTIVE.map((k) => {
       const x = ks[k];
       return `<button class="kstat k-${k}" data-act="quick" data-q="kw" data-k="${k}"><b>${k}</b><span>${x.n ? A.pct(x.f / x.n) : '—'}</span><small>${x.n}/${x.total}</small></button>`;
     }).join('')}
@@ -785,7 +785,7 @@
     } else if (seg === 'formula') {
       body = `<div class="search">${I.search}<input class="input" id="fsearch" type="search" placeholder="공식 검색 (예: RPO, 전자서명, 샘플링)" data-on="fsearch" autocomplete="off"></div>
       <div class="sec-head"><h2 class="sec-title">키워드 공략법</h2></div>
-      <div class="stack">${A.KTYPES.map((k) => `<div class="khint k-${k}"><span><b>${k}</b> ${esc(A.KLABEL[k])}<br>${esc((X.keywordTips || {})[k] || '')}</span></div>`).join('')}</div>
+      <div class="stack">${A.KACTIVE.map((k) => `<div class="khint k-${k}"><span><b>${k}</b> ${esc(A.KLABEL[k])}<br>${esc((X.keywordTips || {})[k] || '')}</span></div>`).join('')}</div>
       ${X.formulas.map((g) => `<section class="card tight fgroup" data-fg><h3>${esc(g.g)}</h3><div class="list">${g.items.map(([f, d]) => `<div class="frow" data-fr="${esc((f + ' ' + d).toLowerCase())}"><b>${esc(f)}</b><span>${esc(d)}</span></div>`).join('')}</div></section>`).join('')}`;
     } else {
       body = `<section class="card tight notes-list"><div class="list">${notesList()}</div></section>

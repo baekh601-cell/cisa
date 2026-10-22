@@ -153,6 +153,9 @@
       A.byD[q.d].push(q);
       if (q.t) A.topics[q.d][q.t] = (A.topics[q.d][q.t] || 0) + 1;
     }
+    // 문항이 없는 키워드 유형(예: 부정형 LEAST)은 필터·통계에서 숨긴다
+    A.KACTIVE = A.KTYPES.filter((k) => A.Q.some((q) => q.k === k));
+    A.KCHIPS = A.KACTIVE.concat('NONE');
     A.decks = C.decks || [];
     A.notes = (C.notes || []).slice().sort((a, b) => (a.domain || 99) - (b.domain || 99));
     A.isaca = C.isaca || { commandments: [], formulas: [], keywordTips: {}, bonus: [] };
@@ -377,7 +380,8 @@
   };
   A.filterQ = (f) => {
     const ds = f.d && f.d.length ? f.d : A.DIDS;
-    const ks = f.k && f.k.length ? new Set(f.k) : null;
+    const kk = (f.k || []).filter((k) => A.KCHIPS.includes(k));
+    const ks = kk.length ? new Set(kk) : null;
     const lv = f.lv && f.lv.length ? new Set(f.lv) : null;
     const term = (f.q || '').trim().toLowerCase();
     const bm = new Set(S.bm);
