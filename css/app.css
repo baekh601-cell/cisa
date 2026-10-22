@@ -416,6 +416,7 @@ mark.kw .en { font-family: var(--font-mono); font-size: 0.78em; font-weight: 600
 .verdict span { font-weight: 600; font-size: 0.84rem; color: var(--fg-2); display: block; }
 .formula { padding: 14px 16px; border-radius: var(--r); background: var(--warn-soft); border: 1px solid color-mix(in srgb, var(--warn) 55%, transparent); display: flex; flex-direction: column; gap: 4px; }
 .formula .eyebrow { color: var(--warn); }
+.formula .isa-tag { align-self: flex-start; padding: 3px 10px; border-radius: 999px; font-size: .8rem; font-weight: 700; color: var(--fg); background: color-mix(in srgb, var(--warn) 22%, transparent); }
 .formula p { margin: 0; font-weight: 700; font-size: 1.02rem; line-height: 1.5; }
 .actionbar {
   position: fixed;

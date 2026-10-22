@@ -15,7 +15,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const QDIR = path.join(ROOT, 'data/questions');
 const SDIR = path.join(ROOT, 'staging');
 const DRY = process.argv.includes('--dry');
-const KEYS = ['id', 'd', 't', 'k', 'lv', 'q', 'o', 'a', 'e', 'f'];
+const KEYS = ['id', 'd', 't', 'k', 'lv', 'q', 'o', 'a', 'e', 'f', 'p'];
 
 function loadExisting(d) {
   const file = path.join(QDIR, `d${d}.js`);
@@ -128,7 +128,8 @@ for (let d = 1; d <= 5; d++) {
       o: order.map((j) => x.o[j].trim()),
       a: targets[i],
       e: order.map((j) => x.e[j].trim()),
-      f: x.f.trim()
+      f: x.f.trim(),
+      p: x.p === 1 ? 1 : undefined
     };
     all[d].push(q);
   });

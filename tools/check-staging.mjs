@@ -45,6 +45,7 @@ export function checkQuestion(x) {
   if (!Number.isInteger(x.a) || x.a < 0 || x.a > 3) errors.push(`a 값 오류: ${x.a}`);
   if (!Array.isArray(x.e) || x.e.length !== 4 || !x.e.every((s) => isStr(s, 15, 450))) errors.push('e는 15~450자 문자열 4개여야 함');
   if (!isStr(x.f, 4, 100)) errors.push('f(한 줄 공식) 누락/길이 오류(4~100자)');
+  if (x.p !== undefined && x.p !== 1) errors.push('p는 1이거나 생략');
   if (errors.length) return { errors, warns };
 
   if (new Set(x.o.map((s) => s.trim())).size !== 4) errors.push('보기 중복');

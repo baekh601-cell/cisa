@@ -14,7 +14,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const QDIR = path.join(ROOT, 'data/questions');
 const RDIR = path.join(ROOT, 'staging/revise');
 const DRY = process.argv.includes('--dry');
-const KEYS = ['id', 'd', 't', 'k', 'lv', 'q', 'o', 'a', 'e', 'f'];
+const KEYS = ['id', 'd', 't', 'k', 'lv', 'q', 'o', 'a', 'e', 'f', 'p'];
 const NAMES = { 1: '정보시스템 감사 프로세스', 2: 'IT 거버넌스 및 관리', 3: '정보시스템 취득·개발·구현', 4: '정보시스템 운영 및 비즈니스 복원력', 5: '정보자산 보호' };
 
 const hash = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619); return h >>> 0; };
@@ -59,7 +59,7 @@ order.forEach((ri, k) => {
   for (let m = others.length - 1; m > 0; m--) { const j = Math.floor(r() * (m + 1)); [others[m], others[j]] = [others[j], others[m]]; }
   const perm = others.slice();
   perm.splice(targets[k], 0, x.a);
-  Object.assign(old, { t: (x.t || old.t).trim(), k: x.k, lv: x.lv, q: x.q.trim(), o: perm.map((j) => x.o[j].trim()), a: targets[k], e: perm.map((j) => x.e[j].trim()), f: x.f.trim() });
+  Object.assign(old, { t: (x.t || old.t).trim(), k: x.k, lv: x.lv, q: x.q.trim(), o: perm.map((j) => x.o[j].trim()), a: targets[k], e: perm.map((j) => x.e[j].trim()), f: x.f.trim(), p: x.p === 1 ? 1 : undefined });
 });
 const after = metrics([...byId.values()]);
 const rev = metrics(revised.map((r) => r.old));

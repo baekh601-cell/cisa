@@ -108,7 +108,7 @@
     wrongD: 0,
     isacaSeg: 'cmd',
     openCmd: {},
-    f: Object.assign({ d: [], k: [], st: 'all', lv: [], topic: '', q: '', n: 20, order: 'rand' }, S.set.lastF || {}),
+    f: Object.assign({ d: [], k: [], st: 'all', ty: 'all', lv: [], topic: '', q: '', n: 20, order: 'rand' }, S.set.lastF || {}),
     preferNew: true,
     sess: null,
     pending: null,
@@ -355,6 +355,8 @@
     <div class="chips">${A.KCHIPS.map((k) => `<button class="chip k-${k}" data-k data-act="fk" data-v="${k}" aria-pressed="${f.k.includes(k)}">${k === 'NONE' ? '일반' : k} <span class="n">${kc[k].total}</span></button>`).join('')}</div>
     <span class="lbl">풀이 상태</span>
     ${segHtml('fst', [['all', '전체'], ['new', '미풀이'], ['wrong', '오답'], ['bm', '북마크'], ['right', '맞힘']], f.st)}
+    <span class="lbl">문항 유형</span>
+    <div class="chips">${[['all', '전체'], ['aud', '감사인 관점'], ['short', '짧은 지식형'], ['isa', 'ISACA 고유 관점']].map(([v, l]) => `<button class="chip" data-act="fty" data-v="${v}" aria-pressed="${(f.ty || 'all') === v}">${l} <span class="n">${A.fmtNum(A.typeCount(v))}</span></button>`).join('')}</div>
     <span class="lbl">난이도</span>
     <div class="chips">${[[1, '기본'], [2, '실전'], [3, '고난도']].map(([v, l]) => `<button class="chip" data-act="flv" data-v="${v}" aria-pressed="${f.lv.includes(v)}">${l}</button>`).join('')}</div>
     <div class="search">${I.search}<input class="input" id="fq" type="search" placeholder="지문·보기 검색 (예: RPO, 감사 훅)" value="${esc(f.q)}" data-on="fq" autocomplete="off"></div>
@@ -483,7 +485,7 @@
   <p class="stem">${A.highlight(q.q)}</p>
   ${verdict}
   <div class="opts">${opts}</div>
-  ${graded || review ? `<div class="formula"><span class="eyebrow">ISACA 한 줄 공식</span><p>${esc(q.f || '')}</p></div>` : ''}
+  ${graded || review ? `<div class="formula">${q.p ? '<span class="isa-tag">ISACA 고유 관점 — 상식보다 ISACA 공식 입장으로 판단</span>' : ''}<span class="eyebrow">ISACA 한 줄 공식</span><p>${esc(q.f || '')}</p></div>` : ''}
   ${(graded || review) && A.notes.some((n) => n.domain === q.d) ? `<button class="btn ghost block" data-act="note" data-id="${esc((A.notes.find((n) => n.domain === q.d) || {}).id)}">${I.book}${D[q.d].code} 요점 노트 열기</button>` : ''}
   <p class="swipe-hint">← 밀어서 다음 · 이전 → ${exam ? '· 모든 응답은 제출 시 채점' : ''}</p>
 </main>
@@ -923,6 +925,7 @@
       rerender();
     },
     fst: (el) => { V.f.st = el.dataset.v; saveFilter(); rerender(); },
+    fty: (el) => { V.f.ty = el.dataset.v; saveFilter(); rerender(); },
     flv: (el) => {
       const v = Number(el.dataset.v);
       V.f.lv = V.f.lv.includes(v) ? V.f.lv.filter((x) => x !== v) : V.f.lv.concat(v);
@@ -931,7 +934,7 @@
     },
     fn: (el) => { V.f.n = el.dataset.v === 'all' ? 'all' : Number(el.dataset.v); saveFilter(); rerender(); },
     ford: (el) => { V.f.order = el.dataset.v; saveFilter(); rerender(); },
-    freset: () => { V.f = { d: [], k: [], st: 'all', lv: [], topic: '', q: '', n: 20, order: 'rand' }; saveFilter(); rerender(); },
+    freset: () => { V.f = { d: [], k: [], st: 'all', ty: 'all', lv: [], topic: '', q: '', n: 20, order: 'rand' }; saveFilter(); rerender(); },
     'start-practice': () => {
       let list = A.filterQ(V.f).map((q) => q.id);
       if (V.f.order === 'rand') A.shuffle(list);

@@ -378,6 +378,9 @@
     if (!p) return 'new';
     return S.wrong[id] ? 'wrong' : p.l ? 'right' : 'wrong';
   };
+  // 문항 유형: 감사인 관점 · 짧은 지식형(80자 이하) · ISACA 고유 관점(p)
+  A.isType = (q, ty) => (ty === 'aud' ? /감사인/.test(q.q) : ty === 'short' ? q.q.length <= 80 : ty === 'isa' ? q.p === 1 : true);
+  A.typeCount = (ty) => (ty === 'all' ? A.Q.length : A.Q.filter((q) => A.isType(q, ty)).length);
   A.filterQ = (f) => {
     const ds = f.d && f.d.length ? f.d : A.DIDS;
     const kk = (f.k || []).filter((k) => A.KCHIPS.includes(k));
@@ -391,6 +394,7 @@
         if (ks && !ks.has(q.k)) continue;
         if (lv && !lv.has(q.lv)) continue;
         if (f.topic && q.t !== f.topic) continue;
+        if (f.ty && f.ty !== 'all' && !A.isType(q, f.ty)) continue;
         if (f.st === 'new' && S.prog[q.id]) continue;
         if (f.st === 'wrong' && !S.wrong[q.id]) continue;
         if (f.st === 'bm' && !bm.has(q.id)) continue;
