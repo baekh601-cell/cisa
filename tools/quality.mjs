@@ -12,10 +12,11 @@ const argmax = (arr) => {
 
 export function metrics(qs) {
   const n = qs.length || 1;
-  let longest = 0, heuristic = 0, trivia = 0, least = 0, opener = 0;
+  let longest = 0, shortest = 0, heuristic = 0, trivia = 0, least = 0, opener = 0;
   for (const q of qs) {
     const L = q.o.map((s) => s.length);
     if (argmax(L) === q.a) longest++;
+    if (argmax(L.map((x) => -x)) === q.a) shortest++;
     const ab = q.o.map((o) => ABS.test(o));
     const mk = q.o.map((o) => (o.match(MIND) || []).length);
     const best = q.o.map((_, i) => i).filter((i) => !ab[i]).sort((a, b) => mk[b] - mk[a] || L[b] - L[a])[0];
@@ -25,11 +26,11 @@ export function metrics(qs) {
     if (/^IS 감사인이/.test(q.q)) opener++;
   }
   const p = (x) => x / n;
-  return { n: qs.length, heuristic: p(heuristic), longest: p(longest), trivia: p(trivia), least: p(least), opener: p(opener) };
+  return { n: qs.length, heuristic: p(heuristic), longest: p(longest), shortest: p(shortest), trivia: p(trivia), least: p(least), opener: p(opener) };
 }
 
 // 실전 기준 (표본 변동을 감안한 배치 단위 한도)
-export const LIMITS = { heuristic: 0.33, longest: 0.32, trivia: 0.0, least: 0.0, opener: 0.25 };
+export const LIMITS = { heuristic: 0.33, longest: 0.32, shortest: 0.32, trivia: 0.0, least: 0.0, opener: 0.25 };
 
 export function judge(m) {
   const fails = [];
@@ -38,4 +39,4 @@ export function judge(m) {
 }
 
 export const fmt = (m) =>
-  `패턴 찍기 정답률 ${(m.heuristic * 100).toFixed(1)}% · 최장 보기=정답 ${(m.longest * 100).toFixed(1)}% · 허수 오답 ${(m.trivia * 100).toFixed(1)}% · 부정형 ${(m.least * 100).toFixed(1)}% · 'IS 감사인이' 시작 ${(m.opener * 100).toFixed(1)}%`;
+  `패턴 찍기 정답률 ${(m.heuristic * 100).toFixed(1)}% · 최장 보기=정답 ${(m.longest * 100).toFixed(1)}% · 최단 보기=정답 ${(m.shortest * 100).toFixed(1)}% · 허수 오답 ${(m.trivia * 100).toFixed(1)}% · 부정형 ${(m.least * 100).toFixed(1)}% · 'IS 감사인이' 시작 ${(m.opener * 100).toFixed(1)}%`;
