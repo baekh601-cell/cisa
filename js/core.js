@@ -379,7 +379,7 @@
     return S.wrong[id] ? 'wrong' : p.l ? 'right' : 'wrong';
   };
   // 문항 유형: 감사인 관점 · 짧은 지식형(80자 이하) · ISACA 고유 관점(p)
-  A.isType = (q, ty) => (ty === 'aud' ? /감사인/.test(q.q) : ty === 'short' ? q.q.length <= 80 : ty === 'isa' ? q.p === 1 : true);
+  A.isType = (q, ty) => (ty === 'aud' ? /감사인|감사\s?(팀|부서|책임자|관리자|조직|실|담당자)|내부감사/.test(q.q) : ty === 'short' ? q.q.length <= 80 : ty === 'isa' ? q.p === 1 : true);
   A.typeCount = (ty) => (ty === 'all' ? A.Q.length : A.Q.filter((q) => A.isType(q, ty)).length);
   A.filterQ = (f) => {
     const ds = f.d && f.d.length ? f.d : A.DIDS;
