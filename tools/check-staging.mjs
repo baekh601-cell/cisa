@@ -4,6 +4,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { metrics, judge, fmt } from './quality.mjs';
 
 export const KEYWORDS = ['FIRST', 'BEST', 'PRIMARY', 'GREATEST', 'MOST', 'LEAST', 'NONE'];
 
@@ -119,6 +120,13 @@ function main(files) {
     });
     total += data.length;
   }
+  if (QUALITY && all.length) {
+    const m = metrics(all);
+    const fails = all.length >= 30 ? judge(m) : [];
+    console.log(`\n[실전 품질] ${fmt(m)}`);
+    fails.forEach((f) => console.log(`ERROR 실전 품질 기준 미달: ${f}`));
+    errCount += fails.length;
+  }
   console.log(`\n문항 ${total}개 · ERROR ${errCount} · WARN ${warnCount}`);
   if (all.length) {
     console.log('키워드:', JSON.stringify(tally(all, 'k')));
@@ -129,4 +137,5 @@ function main(files) {
   process.exit(errCount ? 1 : 0);
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1] || '').href) main(process.argv.slice(2));
+const QUALITY = process.argv.includes('--quality');
+if (import.meta.url === pathToFileURL(process.argv[1] || '').href) main(process.argv.slice(2).filter((a) => !a.startsWith('--')));
