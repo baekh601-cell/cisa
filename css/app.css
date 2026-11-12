@@ -339,6 +339,9 @@ mark.kw .en { font-family: var(--font-mono); font-size: 0.78em; font-weight: 600
 .drow .pct { font-family: var(--font-mono); font-size: 0.86rem; text-align: right; font-variant-numeric: tabular-nums; }
 .drow .pct small { display: block; font-size: 0.64rem; color: var(--muted); }
 
+.card.plan { display: flex; flex-direction: column; gap: 10px; border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+.card.plan .btn { min-height: 44px; }
+.coretag { font-size: .72rem; font-weight: 700; color: var(--warn); white-space: nowrap; }
 .quick { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .qbtn { min-height: 92px; border-radius: var(--r); padding: 14px; text-align: left; background: var(--surface); border: 1px solid var(--line); display: flex; flex-direction: column; justify-content: space-between; gap: 8px; }
 .qbtn:active { transform: scale(0.985); background: var(--surface-2); }

@@ -15,7 +15,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const QDIR = path.join(ROOT, 'data/questions');
 const SDIR = path.join(ROOT, 'staging');
 const DRY = process.argv.includes('--dry');
-const KEYS = ['id', 'd', 't', 'k', 'lv', 'q', 'o', 'a', 'e', 'f', 'p'];
+const KEYS = ['id', 'd', 't', 'k', 'lv', 'q', 'o', 'a', 'e', 'f', 'p', 'h'];
 
 function loadExisting(d) {
   const file = path.join(QDIR, `d${d}.js`);

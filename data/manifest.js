@@ -5,6 +5,8 @@ self.CISA_FILES = [
   'data/cards/cards1.js',
   'data/cards/cards2.js',
   'data/cards/cards3.js',
+  'data/notes/plan.js',
+  'data/notes/cram.js',
   'data/notes/d1.js',
   'data/notes/d2.js',
   'data/notes/d3.js',

@@ -261,6 +261,7 @@
     </div>
     <p class="note-line">가중치 D1 18 · D2 18 · D3 12 · D4 26 · D5 26%를 반영한 첫 시도 정답률 기준 추정치(합격선 450 ≈ 65%).${est.missing.length && est.solved ? ` 미응시: ${est.missing.map((d) => D[d].code).join('·')} — 응시 도메인만 반영 중.` : ''}</p>
   </section>
+  ${planCard()}
   <div class="quick">
     <button class="qbtn hot" data-act="quick" data-q="daily"><span class="qi">${I.bolt}</span><span><b>오늘의 10문제</b><span>도메인 비중대로 · 미풀이 우선</span></span></button>
     <button class="qbtn" data-act="quick" data-q="weak"><span class="qi">${I.target}</span><span><b>약점 집중 20</b><span>${weak ? `${D[weak.d].code} ${weak.label}` : '가장 약한 도메인'}</span></span></button>
@@ -307,9 +308,25 @@
       <text x="${Math.min(W - 12, x(last.i) + 2).toFixed(1)}" y="${Math.max(12, y(last.v) - 9).toFixed(1)}" text-anchor="end" font-size="11" font-family="var(--font-mono)" fill="var(--fg)">${last.v}</text>
     </svg>`;
   }
+  // 2주 합격 플랜 카드 — 핵심 ★ 진도와 바로가기
+  function planCard() {
+    if (!A.core.length) return '';
+    const c = A.coreStats();
+    const left = c.total - c.n;
+    const plan = A.notes.find((n) => n.id === 'plan');
+    return `<section class="card plan" aria-label="2주 합격 플랜">
+    <div class="row"><span class="eyebrow grow">2주 합격 플랜 · 핵심 ★ 먼저</span><span class="pill ${left ? 'na' : 'pass'}">${left ? `${A.fmtNum(left)}문항 남음` : '핵심 완주'}</span></div>
+    <div class="gauge"><i class="fill" style="width:${(c.n / c.total) * 100}%"></i></div>
+    <p class="note-line">핵심 ★ ${A.fmtNum(c.n)} / ${A.fmtNum(c.total)} 풀이${c.n ? ` · 첫 시도 정답률 ${A.pct(c.f / c.n)}` : ''} — 출제 검토에서 고른 ‘시험에 나올 개념당 1문항’. 다 풀면 ISACA 고유 관점 → 오답 → 나머지 순으로.</p>
+    <div class="row wrap">
+      <button class="btn primary grow" data-act="quick" data-q="core">${I.play}핵심 ★ 30문제</button>
+      ${plan ? `<button class="btn" data-act="note" data-id="plan">플랜·함정</button>` : ''}
+      <button class="btn" data-act="tab" data-v="isaca" data-iseg="notes">압축 시트</button>
+    </div></section>`;
+  }
   function notesList() {
     if (!A.notes.length) return '<div class="empty">요점 노트 데이터가 없습니다.</div>';
-    return A.notes.map((n) => `<button class="li" data-act="note" data-id="${esc(n.id)}"><span class="ic">${esc(n.domain ? 'D' + n.domain : n.badge || '★')}</span><span class="grow"><span class="t">${esc(n.title)}</span><span class="s">${(n.sections || []).length}개 단원${n.weight ? ` · 출제 ${n.weight}%` : ''}</span></span><span class="chev">${I.chev}</span></button>`).join('');
+    return A.notes.map((n) => `<button class="li" data-act="note" data-id="${esc(n.id)}"><span class="ic">${esc(n.badge || (n.domain ? 'D' + n.domain : '★'))}</span><span class="grow"><span class="t">${esc(n.title)}</span><span class="s">${(n.sections || []).length}개 단원${n.weight ? ` · 출제 ${n.weight}%` : ''}</span></span><span class="chev">${I.chev}</span></button>`).join('');
   }
   function weakestDomain(st) {
     let best = null;
@@ -356,7 +373,7 @@
     <span class="lbl">풀이 상태</span>
     ${segHtml('fst', [['all', '전체'], ['new', '미풀이'], ['wrong', '오답'], ['bm', '북마크'], ['right', '맞힘']], f.st)}
     <span class="lbl">문항 유형</span>
-    <div class="chips">${[['all', '전체'], ['aud', '감사인 관점'], ['short', '짧은 지식형'], ['isa', 'ISACA 고유 관점']].map(([v, l]) => `<button class="chip" data-act="fty" data-v="${v}" aria-pressed="${(f.ty || 'all') === v}">${l} <span class="n">${A.fmtNum(A.typeCount(v))}</span></button>`).join('')}</div>
+    <div class="chips">${[['all', '전체'], ['core', '핵심 ★'], ['aud', '감사인 관점'], ['short', '짧은 지식형'], ['isa', 'ISACA 고유 관점']].map(([v, l]) => `<button class="chip" data-act="fty" data-v="${v}" aria-pressed="${(f.ty || 'all') === v}">${l} <span class="n">${A.fmtNum(A.typeCount(v))}</span></button>`).join('')}</div>
     <span class="lbl">난이도</span>
     <div class="chips">${[[1, '기본'], [2, '실전'], [3, '고난도']].map(([v, l]) => `<button class="chip" data-act="flv" data-v="${v}" aria-pressed="${f.lv.includes(v)}">${l}</button>`).join('')}</div>
     <div class="search">${I.search}<input class="input" id="fq" type="search" placeholder="지문·보기 검색 (예: RPO, 감사 훅)" value="${esc(f.q)}" data-on="fq" autocomplete="off"></div>
@@ -480,7 +497,7 @@
       ${exam ? `<button class="icon-btn ${bm ? 'on' : ''}" data-act="bm" aria-label="북마크">${bm ? I.starOn : I.star}</button>` : ''}
     </div><div class="qprog"><i style="width:${((s.i + 1) / s.ids.length) * 100}%"></i></div></header>
 <main class="view with-bar" id="qmain">
-  <div class="qmeta">${dtag(q.d)}${q.t ? `<span class="ttag">${esc(q.t)}</span>` : ''}<button class="kbadge k-${q.k}" data-act="khint" aria-label="${q.k} 공략법 보기">${q.k === 'NONE' ? '일반' : q.k} ⓘ</button>${lvDots(q.lv || 2)}<span class="wp">W/P ${esc(q.id)}</span></div>
+  <div class="qmeta">${dtag(q.d)}${q.t ? `<span class="ttag">${esc(q.t)}</span>` : ''}<button class="kbadge k-${q.k}" data-act="khint" aria-label="${q.k} 공략법 보기">${q.k === 'NONE' ? '일반' : q.k} ⓘ</button>${lvDots(q.lv || 2)}${q.h ? '<span class="coretag" title="먼저 풀 핵심 문항">★ 핵심</span>' : ''}<span class="wp">W/P ${esc(q.id)}</span></div>
   ${showHint ? `<div class="khint k-${q.k}"><span><b>${q.k} 공략</b><br>${esc(tip)}</span></div>` : ''}
   <p class="stem">${A.highlight(q.q)}</p>
   ${verdict}
@@ -807,7 +824,7 @@
   <div class="row wrap"><button class="chip" data-act="note-star" aria-pressed="${!!starOnly}">★★★ 핵심만</button><button class="chip" data-act="note-open" data-v="1">모두 펼치기</button><button class="chip" data-act="note-open" data-v="0">모두 접기</button></div></section>
   <div class="search">${I.search}<input class="input" id="nsearch" type="search" placeholder="노트 내 검색" data-on="nsearch" autocomplete="off"></div>
   ${secs.map((s, i) => `<details class="card sec" data-sec="${esc((s.title + ' ' + s.body).toLowerCase())}" ${i === 0 ? 'open' : ''}><summary><b>${esc(s.title)}</b><span class="stars">${'★'.repeat(s.stars || 1)}</span><span class="chev">${I.chev}</span></summary><div class="md">${A.md(s.body)}</div></details>`).join('')}
-  ${n.domain ? `<button class="btn primary lg block" data-act="quick" data-q="dom" data-d="${n.domain}">${I.play}${D[n.domain].code} 문제 20개 풀기</button>` : ''}
+  ${n.domain ? (n.cram && A.core.length ? `<button class="btn primary lg block" data-act="quick" data-q="core" data-d="${n.domain}">${I.play}${D[n.domain].code} 핵심 ★ 30문제 풀기</button>` : `<button class="btn primary lg block" data-act="quick" data-q="dom" data-d="${n.domain}">${I.play}${D[n.domain].code} 문제 20개 풀기</button>`) : ''}
 </main>`;
   }
 
@@ -863,6 +880,7 @@
   // =====================================================================
   const pickIds = {
     daily: () => A.weightedPick(10, true),
+    core: (d) => A.corePick(30, d),
     weak: () => {
       const w = weakestDomain(A.domainStats());
       return w ? prioritize(A.byD[w.d]).slice(0, 20) : [];
@@ -879,11 +897,12 @@
     for (const q of qs) (S.wrong[q.id] ? w : !S.prog[q.id] ? n : r).push(q.id);
     return A.shuffle(w).concat(A.shuffle(n), A.shuffle(r));
   }
-  const QTITLE = { daily: '오늘의 10문제', weak: '약점 집중', wrong: '오답 복습', dom: '도메인 연습', kw: '키워드 집중' };
+  const QTITLE = { core: '핵심 ★', daily: '오늘의 10문제', weak: '약점 집중', wrong: '오답 복습', dom: '도메인 연습', kw: '키워드 집중' };
 
   const ACT = {
     tab: (el) => {
       if (el.dataset.seg) V.examSeg = el.dataset.seg;
+      if (el.dataset.iseg) V.isacaSeg = el.dataset.iseg;
       if (V.cur.name === 'quiz') saveElapsed();
       A.go(el.dataset.v);
     },
@@ -897,7 +916,7 @@
       const k = el.dataset.k;
       const ids = pickIds[t](t === 'kw' ? k : d);
       if (!ids.length) return A.toast(t === 'wrong' ? '오답노트가 비어 있습니다' : '문제가 없습니다');
-      const title = t === 'dom' ? `${D[d].code} 연습` : t === 'kw' ? `${k} 집중` : t === 'weak' ? `약점 집중 · ${D[A.QM[ids[0]].d].code}` : t === 'daily' ? `오늘의 ${ids.length}문제` : QTITLE[t];
+      const title = t === 'core' && d ? `${D[d].code} 핵심 ★` : t === 'dom' ? `${D[d].code} 연습` : t === 'kw' ? `${k} 집중` : t === 'weak' ? `약점 집중 · ${D[A.QM[ids[0]].d].code}` : t === 'daily' ? `오늘의 ${ids.length}문제` : QTITLE[t];
       startSession({ ids, title, src: t });
     },
     resume: () => {

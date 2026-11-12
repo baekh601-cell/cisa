@@ -157,7 +157,9 @@
     A.KACTIVE = A.KTYPES.filter((k) => A.Q.some((q) => q.k === k));
     A.KCHIPS = A.KACTIVE.concat('NONE');
     A.decks = C.decks || [];
-    A.notes = (C.notes || []).slice().sort((a, b) => (a.domain || 99) - (b.domain || 99));
+    const nord = (n) => (n.order != null ? n.order : n.domain || 99);
+    A.notes = (C.notes || []).slice().sort((a, b) => nord(a) - nord(b));
+    A.core = A.Q.filter((q) => q.h === 1); // 출제 검토에서 고른 ‘먼저 풀 핵심’ 문항
     A.isaca = C.isaca || { commandments: [], formulas: [], keywordTips: {}, bonus: [] };
   };
 
@@ -379,7 +381,7 @@
     return S.wrong[id] ? 'wrong' : p.l ? 'right' : 'wrong';
   };
   // 문항 유형: 감사인 관점 · 짧은 지식형(80자 이하) · ISACA 고유 관점(p)
-  A.isType = (q, ty) => (ty === 'aud' ? /감사인|감사\s?(팀|부서|책임자|관리자|조직|실|담당자)|내부감사/.test(q.q) : ty === 'short' ? q.q.length <= 80 : ty === 'isa' ? q.p === 1 : true);
+  A.isType = (q, ty) => (ty === 'aud' ? /감사인|감사\s?(팀|부서|책임자|관리자|조직|실|담당자)|내부감사/.test(q.q) : ty === 'short' ? q.q.length <= 80 : ty === 'isa' ? q.p === 1 : ty === 'core' ? q.h === 1 : true);
   A.typeCount = (ty) => (ty === 'all' ? A.Q.length : A.Q.filter((q) => A.isType(q, ty)).length);
   A.filterQ = (f) => {
     const ds = f.d && f.d.length ? f.d : A.DIDS;
@@ -427,6 +429,22 @@
       ids = ids.concat(pool.slice(0, counts[d]).map((q) => q.id));
     }
     return A.shuffle(ids);
+  };
+
+  // 핵심 ★ 문항에서 n개: 미풀이 → 오답 → 나머지 순, 도메인 비중대로(d를 주면 그 도메인만)
+  A.corePick = (n, d) => {
+    const rank = (q) => (!S.prog[q.id] ? 0 : S.wrong[q.id] ? 1 : 2);
+    const take = (pool, k) => A.shuffle(pool.slice()).sort((a, b) => rank(a) - rank(b)).slice(0, k).map((q) => q.id);
+    if (d) return take(A.core.filter((q) => q.d === d), n);
+    const counts = A.distCounts(n);
+    let ids = [];
+    for (const x of A.DIDS) ids = ids.concat(take(A.core.filter((q) => q.d === x), counts[x]));
+    return A.shuffle(ids);
+  };
+  A.coreStats = () => {
+    const r = { total: A.core.length, n: 0, f: 0 };
+    for (const q of A.core) { const p = S.prog[q.id]; if (p) { r.n++; r.f += p.f; } }
+    return r;
   };
 
   // ---------- 세션 ----------

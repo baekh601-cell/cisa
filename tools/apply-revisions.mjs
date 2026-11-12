@@ -14,7 +14,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const QDIR = path.join(ROOT, 'data/questions');
 const RDIR = path.join(ROOT, 'staging/revise');
 const DRY = process.argv.includes('--dry');
-const KEYS = ['id', 'd', 't', 'k', 'lv', 'q', 'o', 'a', 'e', 'f', 'p'];
+const KEYS = ['id', 'd', 't', 'k', 'lv', 'q', 'o', 'a', 'e', 'f', 'p', 'h'];
 const NAMES = { 1: '정보시스템 감사 프로세스', 2: 'IT 거버넌스 및 관리', 3: '정보시스템 취득·개발·구현', 4: '정보시스템 운영 및 비즈니스 복원력', 5: '정보자산 보호' };
 
 const hash = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619); return h >>> 0; };
@@ -36,7 +36,7 @@ for (const b of done) {
   const want = new Set(JSON.parse(fs.readFileSync(path.join(RDIR, 'in', `${b}.json`), 'utf8')).map((q) => q.id));
   for (const part of ['p1', 'p2']) {
     const f = path.join(RDIR, 'out', `${b}_${part}.json`);
-    if (!fs.existsSync(f)) { console.log(`누락: ${b}_${part}`); continue; }
+    if (!fs.existsSync(f)) { if (part === "p1") console.log(`누락: ${b}_${part}`); continue; }
     const { data, error } = parseJsonFile(f);
     if (error) { console.log(`ERROR ${b}_${part}: ${error}`); continue; }
     for (const x of data) {
