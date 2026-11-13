@@ -318,10 +318,10 @@
     <div class="row"><span class="eyebrow grow">2주 합격 플랜 · 핵심 ★ 먼저</span><span class="pill ${left ? 'na' : 'pass'}">${left ? `${A.fmtNum(left)}문항 남음` : '핵심 완주'}</span></div>
     <div class="gauge"><i class="fill" style="width:${(c.n / c.total) * 100}%"></i></div>
     <p class="note-line">핵심 ★ ${A.fmtNum(c.n)} / ${A.fmtNum(c.total)} 풀이${c.n ? ` · 첫 시도 정답률 ${A.pct(c.f / c.n)}` : ''} — 출제 검토에서 고른 ‘시험에 나올 개념당 1문항’. 다 풀면 ISACA 고유 관점 → 오답 → 나머지 순으로.</p>
-    <div class="row wrap">
-      <button class="btn primary grow" data-act="quick" data-q="core">${I.play}핵심 ★ 30문제</button>
-      ${plan ? `<button class="btn" data-act="note" data-id="plan">플랜·함정</button>` : ''}
-      <button class="btn" data-act="tab" data-v="isaca" data-iseg="notes">압축 시트</button>
+    <button class="btn primary block" data-act="quick" data-q="core">${I.play}핵심 ★ 30문제</button>
+    <div class="row">
+      ${plan ? `<button class="btn grow" data-act="note" data-id="plan">플랜·함정</button>` : ''}
+      <button class="btn grow" data-act="tab" data-v="isaca" data-iseg="notes">압축 시트</button>
     </div></section>`;
   }
   function notesList() {
